@@ -46,7 +46,23 @@ else
         \ }
 endif
 
-function s:open(cmd, files)
+function! Tapi_open(bufnr, args)
+  if len(a:args) < 1
+    return
+  endif
+
+  call s:open(a:args[0], a:args[1:])
+endfunction
+
+function! Tapi_open_wait(bufnr, args)
+  if len(a:args) < 1
+    return
+  endif
+
+  call s:open_wait(a:args[0], a:args[1:])
+endfunction
+
+function! s:open(cmd, files)
   if len(a:files)
     execute s:opencmd_newcmd_mapping[a:cmd]
     return
@@ -57,6 +73,20 @@ function s:open(cmd, files)
       execute a:cmd f
     endfor
   endif
+endfunction
+
+let s:is_leave = v:false
+
+function! s:open_wait(cmd, files)
+  call s:open(cmd, files)
+  augroup TermOpen
+    autocmd! * <buffer>
+    autocmd BufUnload <buffer> :call <SID>leave()
+    autocmd QuitPre <buffer> :call <SID>leave()
+  augroup END
+
+  while s:is_leave
+  endwhile
 endfunction
 
 let &cpo = s:save_cpo
