@@ -8,43 +8,23 @@ let g:loaded_termopen = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-if has('nvim')
-  let s:supported_opencmd = [
-        \ "edit",
-        \ "drop",
-        \ "split",
-        \ "vsplit",
-        \ "tabnew",
-        \ ]
-else
-  let s:supported_opencmd = [
-        \ "open",
-        \ "edit",
-        \ "drop",
-        \ "split",
-        \ "vsplit",
-        \ "tabnew",
-        \ ]
-endif
+let s:supported_opencmd = [
+      \ "open",
+      \ "edit",
+      \ "drop",
+      \ "split",
+      \ "vsplit",
+      \ "tabnew",
+      \ ]
 
-if has('nvim')
-  let s:opencmd_newcmd_mapping = {
-        \ "edit": "enew",
-        \ "drop": "enew",
-        \ "split": "new",
-        \ "vsplit": "vnew",
-        \ "tabnew": "tabnew",
-        \ }
-else
-  let s:opencmd_newcmd_mapping = {
-        \ "open": "enew",
-        \ "edit": "enew",
-        \ "drop": "enew",
-        \ "split": "new",
-        \ "vsplit": "vnew",
-        \ "tabnew": "tabnew",
-        \ }
-endif
+let s:opencmd_newcmd_mapping = {
+      \ "open": "enew",
+      \ "edit": "enew",
+      \ "drop": "enew",
+      \ "split": "new",
+      \ "vsplit": "vnew",
+      \ "tabnew": "tabnew",
+      \ }
 
 function! Tapi_open(bufnr, args)
   if len(a:args) < 1
@@ -59,34 +39,36 @@ function! Tapi_open_wait(bufnr, args)
     return
   endif
 
-  call s:open_wait(a:args[0], a:args[1:])
+  call s:open(a:args[0], a:args[2:])
+  call s:wait(a:bufnr, a:args[1])
 endfunction
 
 function! s:open(cmd, files)
-  if len(a:files)
+  if len(a:files) == 0
     execute s:opencmd_newcmd_mapping[a:cmd]
     return
   endif
 
   if count(s:supported_opencmd, a:cmd) == 1
     for f in a:files
+      echo f
       execute a:cmd f
     endfor
   endif
 endfunction
 
-let s:is_leave = v:false
-
-function! s:open_wait(cmd, files)
-  call s:open(cmd, files)
+function! s:wait(bufnr, str)
+  let b:cur_bufnr = a:bufnr
+  let b:cur_str = "\<Esc>]51;[\"" .. a:str .. "\"]\x07\<CR>"
   augroup TermOpen
     autocmd! * <buffer>
-    autocmd BufUnload <buffer> :call <SID>leave()
-    autocmd QuitPre <buffer> :call <SID>leave()
+    autocmd BufUnload <buffer> :call term_sendkeys(b:cur_bufnr, b:cur_str)
+    autocmd QuitPre <buffer> :call term_sendkeys(b:cur_bufnr, b:cur_str)
   augroup END
+endfunction
 
-  while s:is_leave
-  endwhile
+function! s:leave(cmd, files)
+  let b:is_leave = v:true
 endfunction
 
 let &cpo = s:save_cpo
