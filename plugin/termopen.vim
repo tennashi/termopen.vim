@@ -59,7 +59,7 @@ endfunction
 
 function! s:wait(bufnr, res_id)
   let b:cur_bufnr = a:bufnr
-  let b:res = "{\"res_id\":" .. a:res_id .. ",\"msg\":\"done\"}\<CR>"
+  let b:res = "{\"res_id\":\"" .. a:res_id .. "\",\"msg\":\"done\"}\<CR>"
   augroup TermOpen
     autocmd! * <buffer>
     autocmd BufUnload <buffer> :call term_sendkeys(b:cur_bufnr, b:res)
