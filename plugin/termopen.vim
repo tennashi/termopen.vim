@@ -57,13 +57,13 @@ function! s:open(cmd, files)
   endif
 endfunction
 
-function! s:wait(bufnr, str)
+function! s:wait(bufnr, res_id)
   let b:cur_bufnr = a:bufnr
-  let b:cur_str = "\<Esc>]51;[\"" .. a:str .. "\"]\x07\<CR>"
+  let b:res = "{\"res_id\":" .. a:res_id .. ",\"res\":\"done\"}\<CR>"
   augroup TermOpen
     autocmd! * <buffer>
-    autocmd BufUnload <buffer> :call term_sendkeys(b:cur_bufnr, b:cur_str)
-    autocmd QuitPre <buffer> :call term_sendkeys(b:cur_bufnr, b:cur_str)
+    autocmd BufUnload <buffer> :call term_sendkeys(b:cur_bufnr, b:res)
+    autocmd QuitPre <buffer> :call term_sendkeys(b:cur_bufnr, b:res)
   augroup END
 endfunction
 
