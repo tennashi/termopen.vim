@@ -56,7 +56,7 @@ echo -e "\x1b]51;[\"call\", \"Tapi_open_wait\", [\"edit\", \"response_id\", \"ho
 while :
 do
   read res
-  if [ $res = "{\"res_id\": \"response_id\", \"msg\": \"done\"}" ]; then
+  if [ "${res}" = "{\"res_id\":\"response_id\",\"msg\":\"done\"}" ]; then
     exit
   fi
 done
