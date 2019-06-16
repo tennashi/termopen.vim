@@ -12,7 +12,7 @@ Plug 'tennashi/termopen.vim'
 `Tapi_open` opens `<file_name>`.
 
 ### Request
-```json
+```
 ["call", "Tapi_open", [<open_cmd>, <file_name>]]
 ```
 
